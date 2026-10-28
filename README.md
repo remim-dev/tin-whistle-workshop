@@ -42,12 +42,13 @@ Copy the `en` block in `i18n.js`, give it the two-letter language code (`it`, `g
 
 Add an entry to `tunes.js` with an `id`, a `level` (1 to 3), a type (`rk`), short descriptions and the ABC, written for a D whistle.
 
-Only add tunes that are traditional or in the public domain, in a transcription **you wrote yourself** (or one explicitly released for free reuse). Many online collections have their own licence terms, so please don't copy tunes from them into the bank. Anyone can still paste tunes from those sites into their own browser with “Add a tune to my collection”.
+Only add tunes that are traditional or in the public domain, in a transcription **you wrote yourself** (or one explicitly released for free reuse). By contributing, you agree to release your contribution under the project's licence. Many online collections have their own licence terms, so please don't copy tunes from them into the bank. Anyone can still paste tunes from those sites into their own browser with “Add a tune to my collection”.
 
-## Licences
+## Credits and licence
 
-- Code: [MIT](LICENSE).
-- ABC transcriptions in `tunes.js`: [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/). The tunes themselves are traditional or in the public domain.
+Created by [remim-dev](https://github.com/remim-dev).
+
+- The whole project (code, texts and ABC transcriptions) is licensed under [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/), see [LICENSE](LICENSE). You may share and adapt it for **non-commercial** purposes, crediting remim-dev and keeping the same licence. The tunes themselves are traditional or in the public domain.
 - [abcjs](https://github.com/paulrosen/abcjs) (MIT) is loaded from cdnjs. The Atkinson Hyperlegible, IBM Plex Mono and Uncial Antiqua fonts (SIL Open Font License) are loaded from Google Fonts.
 
 ---
@@ -82,6 +83,8 @@ Une connexion Internet est nécessaire au premier chargement, pour abcjs et les 
 - **Une langue** : copiez le bloc `en` de `i18n.js` sous le code de la langue et traduisez les valeurs. Ajoutez aussi les descriptions des airs dans `tunes.js`.
 - **Un air** : seulement des airs traditionnels ou du domaine public, dans une transcription que vous avez écrite vous-même. Ne copiez pas d'airs depuis des collections en ligne soumises à leurs propres licences.
 
-### Licences
+### Crédits et licence
 
-Code sous licence MIT, transcriptions ABC sous licence CC0, abcjs sous licence MIT, polices sous licence SIL OFL.
+Créé par [remim-dev](https://github.com/remim-dev).
+
+L'ensemble du projet (code, textes et transcriptions ABC) est sous licence [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.fr) : vous pouvez le partager et l'adapter à des fins **non commerciales**, en citant remim-dev et en gardant la même licence. Les airs eux-mêmes sont traditionnels ou du domaine public. abcjs est sous licence MIT, les polices sous licence SIL OFL.

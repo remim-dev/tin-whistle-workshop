@@ -1,5 +1,5 @@
 // Tune bank. Every tune here is traditional or in the public domain, and every ABC
-// transcription was written for this project and is released under CC0 1.0.
+// transcription was written for this project. Licence: CC BY-NC-SA 4.0 (see LICENSE).
 // Please only add tunes you transcribed yourself (or that are explicitly free to reuse).
 //
 // Fields:
