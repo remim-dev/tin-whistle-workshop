@@ -213,6 +213,7 @@ textarea { width: 100%; min-height: 170px; font-family: var(--font-mono); font-s
 .langpick { display: inline-flex; align-items: center; gap: 8px; }
 .langpick select { width: auto; padding: 5px 8px; }
 .credits a, .author a { color: var(--green); }
+.io { border-top: 1px solid var(--line); padding-top: 12px; margin-top: 4px; display: flex; flex-direction: column; gap: 8px; }
 .credits-box { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 12px 16px; display: flex; flex-direction: column; gap: 6px; }
 .credits-box p { margin: 0; }
 .author { font-size: 15px; }
@@ -361,6 +362,17 @@ textarea { width: 100%; min-height: 170px; font-family: var(--font-mono); font-s
         <button type="button" class="btn small" id="deleteTune" hidden data-i18n="remove"></button>
       </div>
       <p class="msg" id="customMsg"></p>
+      <div class="io">
+        <span class="label" data-i18n="ioTitle"></span>
+        <p class="hint" data-i18n="ioHelp"></p>
+        <div class="row">
+          <button type="button" class="btn" id="importBtn"><svg viewBox="0 0 16 16"><path d="M8 1.5l-4 4h2.5V10h3V5.5H12zM2.5 12h11v2.5h-11z"/></svg><span data-i18n="importBtn"></span></button>
+          <input type="file" id="importFile" accept=".abc,.txt,text/plain,text/vnd.abc" multiple hidden>
+          <button type="button" class="btn" id="exportAll"><svg viewBox="0 0 16 16"><path d="M8 10.5l4-4H9.5V2h-3v4.5H4zM2.5 12h11v2.5h-11z"/></svg><span data-i18n="exportAll"></span></button>
+          <button type="button" class="btn" id="exportMine"><svg viewBox="0 0 16 16"><path d="M8 10.5l4-4H9.5V2h-3v4.5H4zM2.5 12h11v2.5h-11z"/></svg><span data-i18n="exportMine"></span></button>
+        </div>
+        <p class="msg" id="ioMsg" role="status"></p>
+      </div>
     </div>
   </details>
 

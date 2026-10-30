@@ -118,6 +118,8 @@
   const descOf = t => t.custom ? tr("customDesc") : (t.desc ? t.desc[state.lang] || t.desc.en || "" : "");
   const levelOf = t => t.custom ? tr("mine") : tr("level" + t.level);
   const norm = s => (s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+  // Alphabetical order ignores leading articles and punctuation ("The Kesh Jig" sorts under K)
+  const sortKey = s => norm(s).replace(/^[^a-z0-9]+/, "").replace(/^(the|an|a|le|la|les|un|une|el|los|las|der|die|das|ein|eine) +|^l'/, "");
   const searchText = t => norm([t.abcTitle].concat(t.title ? Object.values(t.title) : []).join(" | "));
   const currentTune = () => allTunes().find(t => t.id === state.tuneId) || TUNES[0];
   const currentKey = () => KEYS.find(k => k.id === state.keyId) || KEYS[1];
@@ -761,6 +763,7 @@
       if (state.fits && !fitInfo(t).ok) return false;
       return true;
     });
+    list.sort((a, b) => sortKey(titleOf(a)).localeCompare(sortKey(titleOf(b)), state.lang));
     const box = $("results");
     if (!list.length) {
       box.innerHTML = `<div class="empty">${esc(tr("empty"))}</div>`;
@@ -824,30 +827,94 @@
   function saveCustom() {
     store.set("tww.custom", custom.map(t => ({ id: t.id, rk: t.rk, abc: t.abc })));
   }
+  // A text can hold several tunes, each starting with an X: line
+  function splitAbc(text) {
+    text = String(text || "").replace(/^\uFEFF/, "").replace(/\r\n?/g, "\n");
+    return text.split(/^(?=X:)/m).map(s => s.trim()).filter(s => /^K:/m.test(s))
+      .map(s => /^X:/.test(s) ? s : "X:1\n" + s);
+  }
+  function hasNotes(text) {
+    try {
+      const lines = ABCJS.parseOnly(text)[0].lines || [];
+      return lines.some(l => l.staff && l.staff.some(s => s.voices && s.voices.some(v => v.some(el => el.el_type === "note" && el.pitches))));
+    } catch (e) { return false; }
+  }
+  // Two tunes are the same if they match apart from X:, R:, comments and spacing
+  const sameKey = abc => abc.replace(/^(X|R):.*$/gm, "").replace(/^%.*$/gm, "").replace(/\s+/g, "");
+  // Adds every readable tune of the text to "My tunes", skipping ones already in the bank
+  function importAbc(text) {
+    const parts = splitAbc(text);
+    const known = new Set(allTunes().map(t => sameKey(t.abc)));
+    const res = { found: parts.length, added: 0, dup: 0, bad: 0, firstId: null };
+    parts.forEach((abc, i) => {
+      if (!hasNotes(abc)) { res.bad++; return; }
+      const k = sameKey(abc);
+      if (known.has(k)) { res.dup++; return; }
+      known.add(k);
+      const id = "mine-" + Date.now().toString(36) + "-" + i;
+      custom.push(prepare({ id, rk: rhythmOf(abc), abc, custom: true }));
+      res.added++;
+      if (!res.firstId) res.firstId = id;
+    });
+    if (res.added) {
+      saveCustom();
+      state.tuneId = res.firstId;
+      savePrefs();
+      fillSelects();
+      renderTune();
+    }
+    return res;
+  }
+  function say(el, cls, text) { el.className = "msg " + cls; el.textContent = text; }
+
   $("addTune").addEventListener("click", () => {
     const abc = $("abcInput").value.trim();
     const msg = $("customMsg");
-    msg.className = "msg";
-    if (!/^K:/m.test(abc)) { msg.className = "msg err"; msg.textContent = tr("errNoK"); return; }
-    const text = /^X:/m.test(abc) ? abc : "X:1\n" + abc;
-    const probe = document.createElement("div");
-    let ok = false;
-    try {
-      const r = ABCJS.renderAbc(probe, text, {});
-      const lines = r[0] && r[0].lines ? r[0].lines : [];
-      ok = lines.some(l => l.staff && l.staff.some(s => s.voices && s.voices.some(v => v.some(el => el.el_type === "note" && el.pitches))));
-    } catch (e) { ok = false; }
-    if (!ok) { msg.className = "msg err"; msg.textContent = tr("errNoNotes"); return; }
-    const id = "mine-" + Date.now();
-    custom.push(prepare({ id, rk: rhythmOf(text), abc: text, custom: true }));
-    saveCustom();
-    state.tuneId = id;
-    savePrefs();
-    fillSelects();
-    renderTune();
-    msg.className = "msg ok";
-    msg.textContent = tr("added");
-    $("abcInput").value = "";
+    if (!/^K:/m.test(abc)) { say(msg, "err", tr("errNoK")); return; }
+    const r = importAbc(abc);
+    if (r.found === 1 && r.added === 1) say(msg, "ok", tr("added"));
+    else if (r.added) say(msg, "ok", tr("importResult", r.added, r.dup, r.bad));
+    else if (r.dup && !r.bad) say(msg, "err", tr("alreadyThere"));
+    else { say(msg, "err", tr("errNoNotes")); return; }
+    if (r.added) $("abcInput").value = "";
+  });
+
+  // ---------- Import / export (.abc files) ----------
+  $("importBtn").addEventListener("click", () => $("importFile").click());
+  $("importFile").addEventListener("change", async e => {
+    const files = [...e.target.files];
+    e.target.value = "";
+    if (!files.length) return;
+    let text = "";
+    try { for (const f of files) text += "\n\n" + await f.text(); } catch (err) { say($("ioMsg"), "err", tr("readError")); return; }
+    const r = importAbc(text);
+    if (!r.found) say($("ioMsg"), "err", tr("readError"));
+    else say($("ioMsg"), r.added ? "ok" : "err", r.added ? tr("importResult", r.added, r.dup, r.bad) : r.dup ? tr("alreadyThere") : tr("readError"));
+  });
+  function exportAbc(list, fileName, withLicence) {
+    const day = new Date().toISOString().slice(0, 10);
+    const head = ["%abc-2.1", `% ${tr("title")}: https://remim-dev.github.io/tin-whistle-workshop/`, `% ${day}, tunes: ${list.length}`];
+    if (withLicence) head.push("% ABC transcriptions by remim-dev, CC BY-NC-SA 4.0: https://creativecommons.org/licenses/by-nc-sa/4.0/");
+    const body = list.map((t, i) => {
+      let abc = t.abc.trim().replace(/^X:.*$/m, "X:" + (i + 1));
+      if (!/^R:/m.test(abc) && t.rk && t.rk !== "other") abc = abc.replace(/^(T:.*)$/m, "$1\nR:" + t.rk);
+      return abc;
+    });
+    const blob = new Blob([head.join("\n") + "\n\n" + body.join("\n\n") + "\n"], { type: "text/vnd.abc;charset=utf-8" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `${fileName}-${day}.abc`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    say($("ioMsg"), "ok", tr("exported", list.length));
+  }
+  const byTitle = list => list.slice().sort((a, b) => sortKey(titleOf(a)).localeCompare(sortKey(titleOf(b)), state.lang));
+  $("exportAll").addEventListener("click", () => exportAbc(byTitle(allTunes()), "tin-whistle-bank", true));
+  $("exportMine").addEventListener("click", () => {
+    if (!custom.length) { say($("ioMsg"), "err", tr("exportEmpty")); return; }
+    exportAbc(byTitle(custom), "my-tin-whistle-tunes", false);
   });
   $("deleteTune").addEventListener("click", () => {
     const t = currentTune();

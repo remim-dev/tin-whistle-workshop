@@ -13,6 +13,8 @@ A free web app for learning the Irish tin whistle. Pick a tune: the whistle on t
 - **Any whistle key**: C, D (default), E♭, F, G, A, B♭. Either keep your D fingerings with the score transposed, or keep concert pitch and get the matching fingerings.
 - **Playability check**: each tune shows whether it fits your whistle, needs half-holes or goes out of range, and you can filter the list to show only easy tunes.
 - **Your own tunes**: paste any tune in [ABC notation](https://abcnotation.com/wiki/abc:standard:v2.1). It is saved in your browser.
+- **Import and export**: save the whole bank or just your own tunes as a standard `.abc` file, and import `.abc` files (several tunes per file, duplicates skipped). Handy for backups or moving to another device.
+- Tunes listed in alphabetical order, ignoring leading articles (“The Kesh Jig” sorts under K).
 - **Four languages**: English, French, Spanish and German, picked from your browser settings and switchable at any time.
 - Fingering chart, light and dark themes, works on phones.
 
@@ -66,6 +68,8 @@ Une application web libre pour apprendre la flûte irlandaise (tin whistle). Cho
 - **Toutes les tonalités de flûte** : Do, Ré (par défaut), Mi♭, Fa, Sol, La, Si♭. On garde les doigtés de Ré avec une partition transposée, ou bien la hauteur réelle avec les doigtés correspondants.
 - **Jouabilité** : chaque air indique s'il tient sur votre flûte, demande des demi-trous ou sort de la tessiture, et la liste peut ne montrer que les airs faciles.
 - **Vos propres airs** : collez n'importe quel morceau en notation ABC. Il est enregistré dans votre navigateur.
+- **Import et export** : enregistrez toute la banque ou seulement vos morceaux dans un fichier `.abc` standard, et importez des fichiers `.abc` (plusieurs airs par fichier, doublons ignorés). Pratique pour une sauvegarde ou pour passer sur un autre appareil.
+- Morceaux classés par ordre alphabétique, sans tenir compte des articles (« The Kesh Jig » est rangé à K).
 - **Quatre langues** : français, anglais, espagnol et allemand, choisies d'après le navigateur et modifiables à tout moment.
 - Tableau des doigtés, thèmes clair et sombre, fonctionne sur téléphone.
 
