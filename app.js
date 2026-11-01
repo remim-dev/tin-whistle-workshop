@@ -965,11 +965,17 @@
     }
   }
   async function trainStart() {
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { trainSay("err", "trainNoMic"); return; }
+    // The microphone needs https (or localhost): a page opened as a local file may not get it
+    if (!window.isSecureContext || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { trainSay("err", window.isSecureContext ? "trainNoMic" : "trainInsecure"); return; }
+    trainSay("", "trainAsking");
     try {
       // Raw sound: the browser's voice processing would distort a whistle
       train.stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false } });
-    } catch (e) { trainSay("err", "trainMicError"); return; }
+    } catch (e) {
+      // A refusal remembered by the browser fails at once, without asking again
+      trainSay("err", e.name === "NotAllowedError" || e.name === "SecurityError" ? "trainMicBlocked" : e.name === "NotFoundError" ? "trainMicNone" : "trainMicError", e.name);
+      return;
+    }
     // The melody would be heard by the microphone
     if (state.playing || state.paused) { hardStop(); resetDisplay(); }
     synth.init();
