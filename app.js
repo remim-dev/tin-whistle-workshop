@@ -625,9 +625,13 @@
   }
 
   // ---------- Transport ----------
+  // Updates both the main controls and their copy under the whistle
   function setPlayUI() {
-    $("playLabel").textContent = tr(state.playing ? "pause" : state.paused ? "resume" : "play");
-    $("playIcon").innerHTML = state.playing ? '<rect x="3.5" y="2.5" width="3" height="11" rx="1"/><rect x="9.5" y="2.5" width="3" height="11" rx="1"/>' : '<path d="M4 2.5v11l9-5.5z"/>';
+    const label = tr(state.playing ? "pause" : state.paused ? "resume" : "play");
+    const icon = state.playing ? '<rect x="3.5" y="2.5" width="3" height="11" rx="1"/><rect x="9.5" y="2.5" width="3" height="11" rx="1"/>' : '<path d="M4 2.5v11l9-5.5z"/>';
+    $("playLabel").textContent = $("tPlayLabel").textContent = label;
+    $("playIcon").innerHTML = $("tPlayIcon").innerHTML = icon;
+    $("tPlay").setAttribute("aria-label", label);
   }
 
   function countIn() {
@@ -704,6 +708,7 @@
   function updateTempoLabel() {
     const pct = Math.round(state.speed * 100);
     $("speedOut").textContent = pct + " % · " + (visualObj ? qpm() : "–") + " " + beatUnit();
+    $("tSpeedOut").textContent = pct + " %";
   }
   function beatUnit() {
     const q = field(currentTune().abc, "Q");
@@ -1061,14 +1066,28 @@
   $("setFrom").addEventListener("click", () => { if (selMeasure != null) setPassage(selMeasure, Math.max(selMeasure, state.to)); });
   $("setTo").addEventListener("click", () => { if (selMeasure != null) setPassage(Math.min(selMeasure, state.from), selMeasure); });
   $("play").addEventListener("click", togglePlay);
+  $("tPlay").addEventListener("click", togglePlay);
   $("stop").addEventListener("click", () => { hardStop(); resetDisplay(); });
-  $("speed").value = Math.round(state.speed * 100);
-  $("speed").addEventListener("input", e => setSpeed(+e.target.value / 100));
+  $("tStop").addEventListener("click", () => { hardStop(); resetDisplay(); });
+  ["speed", "tSpeed"].forEach(id => {
+    $(id).value = Math.round(state.speed * 100);
+    $(id).addEventListener("input", e => {
+      $("speed").value = $("tSpeed").value = e.target.value;
+      setSpeed(+e.target.value / 100);
+    });
+  });
   [["metro", "metro"], ["countin", "countIn"], ["melody", "melody"], ["loop", "loop"]].forEach(([id, key]) => {
     const el = $(id);
+    // metro and loop also have a copy under the whistle (tmetro, tloop)
+    const copy = $("t" + id);
     el.checked = state[key];
+    if (copy) {
+      copy.checked = state[key];
+      copy.addEventListener("change", () => { el.checked = copy.checked; el.dispatchEvent(new Event("change")); });
+    }
     el.addEventListener("change", () => {
       state[key] = el.checked;
+      if (copy) copy.checked = el.checked;
       if (key === "melody" && !el.checked) synth.off();
       if (key === "loop") setPassage(state.from, state.to);
       $("countin").disabled = !state.metro;

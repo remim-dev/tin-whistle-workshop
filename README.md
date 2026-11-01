@@ -10,7 +10,7 @@ A free web app for learning the Irish tin whistle. Pick a tune: the whistle on t
 - **Playing technique guide**, illustrated: holding the whistle, breath, tonguing, the second octave, half-holes, cross-fingering and ornaments (cuts, taps, rolls), with tappable fingerings and short scores.
 - **12 exercises**: scales (D, thirds, G with C natural, jig rhythm), octaves (echoes, jumps, slurs, long high notes) and half-holes (F natural, B flat, G sharp, chromatic scale), each linked from the guide.
 - **Automatic difficulty level** (beginner, intermediate, advanced), estimated from the tempo of the tune type, the share of second-octave notes, half-holes, cross-fingerings, leaps and ornaments (`difficulty.js`). Imported tunes get one too; estimated levels are marked with *.
-- **Live fingerings**: a large whistle diagram follows the score note by note, together with the next note. Badges flag the second octave, half-holes and cross-fingerings.
+- **Live fingerings**: a large whistle diagram follows the score note by note, together with the next note. It stays on screen as you scroll, with play, stop, speed, metronome and loop right below it. Badges flag the second octave, half-holes and cross-fingerings.
 - **Tab view**: a small whistle drawn under every note of the staff, highlighted as the tune plays.
 - **Adjustable speed** (30 to 150 %), **metronome**, and a one-bar **count-in**.
 - **Practise a section**: numbered bars, start from any bar, loop the whole tune or just a few bars.
@@ -73,7 +73,7 @@ Une application web libre pour apprendre la flûte irlandaise (tin whistle). Cho
 - **Guide des techniques de jeu** illustré : tenue de la flûte, souffle, coup de langue, deuxième octave, demi-trous, doigté croisé et ornements (coupés, frappés, roulés), avec des doigtés à toucher pour les entendre et de courtes partitions.
 - **12 exercices** : gammes (Ré, tierces, Sol avec Do naturel, rythme de jig), octaves (échos, sauts, liaisons, notes longues aiguës) et demi-trous (Fa naturel, Si bémol, Sol dièse, gamme chromatique), accessibles depuis le guide.
 - **Niveau de difficulté automatique** (débutant, intermédiaire, avancé), estimé d'après le tempo du type d'air, la part de notes en 2ᵉ octave, les demi-trous, les doigtés croisés, les sauts et les ornements (`difficulty.js`). Les morceaux importés en reçoivent un aussi ; les niveaux estimés sont marqués d'une *.
-- **Doigtés en direct** : un grand schéma de flûte suit la partition note par note, avec la note suivante. Des badges signalent la 2ᵉ octave, les demi-trous et les doigtés croisés.
+- **Doigtés en direct** : un grand schéma de flûte suit la partition note par note, avec la note suivante. Il reste à l'écran pendant le défilement, avec juste en dessous lecture, stop, vitesse, métronome et boucle. Des badges signalent la 2ᵉ octave, les demi-trous et les doigtés croisés.
 - **Mode tablature** : une mini-flûte sous chaque note de la portée, mise en évidence pendant la lecture.
 - **Vitesse réglable** (de 30 à 150 %), **métronome** et **décompte** d'une mesure.
 - **Travail par passage** : mesures numérotées, départ à n'importe quelle mesure, boucle sur tout le morceau ou sur quelques mesures.
