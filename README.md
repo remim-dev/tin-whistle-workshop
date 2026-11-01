@@ -6,6 +6,8 @@ A free web app for learning the Irish tin whistle. Pick a tune: the whistle on t
 
 ## Features
 
+- **218 tunes**: 18 workshop tunes (songs, airs, first Irish tunes) and **200 well-known tunes from O'Neill's *Music of Ireland*** (1903): jigs, reels, hornpipes, slip jigs, set dances, marches and airs. Filter by collection, level and type.
+- **Automatic difficulty level** (beginner, intermediate, advanced), estimated from the tempo of the tune type, the share of second-octave notes, half-holes, cross-fingerings, leaps and ornaments (`difficulty.js`). Imported tunes get one too; estimated levels are marked with *.
 - **Live fingerings**: a large whistle diagram follows the score note by note, together with the next note. Badges flag the second octave, half-holes and cross-fingerings.
 - **Tab view**: a small whistle drawn under every note of the staff, highlighted as the tune plays.
 - **Adjustable speed** (30 to 150 %), **metronome**, and a one-bar **count-in**.
@@ -34,7 +36,9 @@ An Internet connection is needed the first time, to load [abcjs](https://www.abc
 | `index.html` | Page layout and styles |
 | `app.js` | Application logic (score, timing, fingerings, audio) |
 | `i18n.js` | Interface translations |
-| `tunes.js` | The tune bank, in ABC notation |
+| `tunes.js` | The workshop tunes, in ABC notation |
+| `tunes-oneill.js` | 200 tunes from O'Neill's *Music of Ireland* (GPL, see below) |
+| `difficulty.js` | Difficulty estimate, used by the app and to build `tunes-oneill.js` |
 
 ## Adding a language
 
@@ -42,7 +46,7 @@ Copy the `en` block in `i18n.js`, give it the two-letter language code (`it`, `g
 
 ## Adding tunes
 
-Add an entry to `tunes.js` with an `id`, a `level` (1 to 3), a type (`rk`), short descriptions and the ABC, written for a D whistle.
+Add an entry to `tunes.js` with an `id`, a `level` (1 to 3, or check what `difficulty.js` gives), a type (`rk`), short descriptions and the ABC, written for a D whistle.
 
 Only add tunes that are traditional or in the public domain, in a transcription **you wrote yourself** (or one explicitly released for free reuse). By contributing, you agree to release your contribution under the project's licence. Many online collections have their own licence terms, so please don't copy tunes from them into the bank. Anyone can still paste tunes from those sites into their own browser with “Add a tune to my collection”.
 
@@ -51,6 +55,7 @@ Only add tunes that are traditional or in the public domain, in a transcription 
 Created by [remim-dev](https://github.com/remim-dev).
 
 - The whole project (code, texts and ABC transcriptions) is licensed under [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/), see [LICENSE](LICENSE). You may share and adapt it for **non-commercial** purposes, crediting remim-dev and keeping the same licence. The tunes themselves are traditional or in the public domain.
+- **Exception, `tunes-oneill.js`**: the 200 tunes come from Francis O'Neill's *The Music of Ireland* (Chicago, 1903, public domain), in the ABC transcriptions of the [O'Neill's Project](https://trillian.mit.edu/~jc/music/book/ONeills/) (1997–2000; each tune names its transcriber in its `Z:` line). That file is distributed under the [GNU GPL v2 or later](LICENSE-GPL-2.0.txt), as the project requires, not under CC BY-NC-SA. Only tunes that stay within the range of a D whistle were kept. Titles were tidied and a type and learning tempo were added; the notes are unchanged. These are O'Neill's 1903 settings, which sometimes differ from the versions played in sessions today.
 - [abcjs](https://github.com/paulrosen/abcjs) (MIT) is loaded from cdnjs. The Atkinson Hyperlegible, IBM Plex Mono and Uncial Antiqua fonts (SIL Open Font License) are loaded from Google Fonts.
 
 ---
@@ -61,6 +66,8 @@ Une application web libre pour apprendre la flûte irlandaise (tin whistle). Cho
 
 ### Fonctionnalités
 
+- **218 morceaux** : 18 morceaux de l'atelier (chansons, airs, premiers airs irlandais) et **200 airs connus du recueil O'Neill's *Music of Ireland*** (1903) : jigs, reels, hornpipes, slip jigs, set dances, marches et airs lents. Filtres par collection, niveau et type.
+- **Niveau de difficulté automatique** (débutant, intermédiaire, avancé), estimé d'après le tempo du type d'air, la part de notes en 2ᵉ octave, les demi-trous, les doigtés croisés, les sauts et les ornements (`difficulty.js`). Les morceaux importés en reçoivent un aussi ; les niveaux estimés sont marqués d'une *.
 - **Doigtés en direct** : un grand schéma de flûte suit la partition note par note, avec la note suivante. Des badges signalent la 2ᵉ octave, les demi-trous et les doigtés croisés.
 - **Mode tablature** : une mini-flûte sous chaque note de la portée, mise en évidence pendant la lecture.
 - **Vitesse réglable** (de 30 à 150 %), **métronome** et **décompte** d'une mesure.
@@ -91,4 +98,6 @@ Une connexion Internet est nécessaire au premier chargement, pour abcjs et les 
 
 Créé par [remim-dev](https://github.com/remim-dev).
 
-L'ensemble du projet (code, textes et transcriptions ABC) est sous licence [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.fr) : vous pouvez le partager et l'adapter à des fins **non commerciales**, en citant remim-dev et en gardant la même licence. Les airs eux-mêmes sont traditionnels ou du domaine public. abcjs est sous licence MIT, les polices sous licence SIL OFL.
+L'ensemble du projet (code, textes et transcriptions ABC), sauf le fichier `tunes-oneill.js`, est sous licence [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.fr) : vous pouvez le partager et l'adapter à des fins **non commerciales**, en citant remim-dev et en gardant la même licence. Les airs eux-mêmes sont traditionnels ou du domaine public. abcjs est sous licence MIT, les polices sous licence SIL OFL.
+
+**Exception, `tunes-oneill.js`** : les 200 airs viennent du recueil *The Music of Ireland* de Francis O'Neill (Chicago, 1903, domaine public), dans les transcriptions ABC de l'[O'Neill's Project](https://trillian.mit.edu/~jc/music/book/ONeills/) (1997–2000 ; chaque air cite son transcripteur dans sa ligne `Z:`). Ce fichier est distribué sous [GNU GPL v2 ou ultérieure](LICENSE-GPL-2.0.txt), comme l'exige ce projet, et non sous CC BY-NC-SA. Seuls les airs qui tiennent dans la tessiture d'une flûte en Ré ont été gardés. Les titres ont été harmonisés, un type et un tempo d'apprentissage ajoutés ; les notes sont inchangées. Ce sont les versions d'O'Neill de 1903, parfois différentes de celles jouées aujourd'hui en session.

@@ -78,6 +78,7 @@ body {
 .tunes-group { grid-row: span 2; }
 .search { width: 100%; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--line); background: var(--paper); font: inherit; color: inherit; }
 .filters { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; }
+.filters .wide { grid-column: 1 / -1; }
 .results { border: 1px solid var(--line); border-radius: 8px; background: var(--paper); max-height: 236px; overflow-y: auto; display: flex; flex-direction: column; }
 .res { display: grid; grid-template-columns: 10px minmax(0, 1fr) auto; gap: 9px; align-items: center; text-align: left; border: 0; border-bottom: 1px solid var(--line); background: transparent; padding: 7px 10px; cursor: pointer; font-size: 14px; }
 .res:last-child { border-bottom: 0; }
@@ -246,6 +247,7 @@ textarea { width: 100%; min-height: 170px; font-family: var(--font-mono); font-s
       <label class="label" for="search" data-i18n="tune"></label>
       <input type="search" class="search" id="search" data-i18n-ph="searchPh" autocomplete="off">
       <div class="filters">
+        <select id="source" class="wide" data-i18n-aria="sourceAria"></select>
         <select id="level" data-i18n-aria="levelAria"></select>
         <select id="rhythm" data-i18n-aria="rhythmAria"></select>
       </div>
@@ -386,7 +388,9 @@ textarea { width: 100%; min-height: 170px; font-family: var(--font-mono); font-s
 <noscript><p class="credits">This app needs JavaScript.</p></noscript>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/abcjs/6.4.4/abcjs-basic-min.js"></script>
 <script src="i18n.js"></script>
+<script src="difficulty.js"></script>
 <script src="tunes.js"></script>
+<script src="tunes-oneill.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

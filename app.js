@@ -20,8 +20,8 @@
   const FING = ["XXXXXX", "XXXXXH", "XXXXXO", "XXXXHO", "XXXXOO", "XXXOOO", "XXHOOO", "XXOOOO", "XHOOOO", "XOOOOO", "OXXOOO", "OOOOOO"];
   const MODES = { "": "major", maj: "major", ion: "major", m: "minor", min: "minor", aeo: "minor", dor: "dorian", mix: "mixolydian", lyd: "lydian", phr: "phrygian", loc: "locrian" };
   const LETTER_PC = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
-  const RHYTHM_ORDER = ["exercise", "song", "classical", "air", "jig", "slip jig", "reel", "hornpipe", "polka", "slide", "waltz", "march", "other"];
-  const R_ALIASES = { "slow air": "air", air: "air", "single jig": "jig", "double jig": "jig", slipjig: "slip jig", valse: "waltz", "set dance": "other", barndance: "hornpipe", strathspey: "other" };
+  const RHYTHM_ORDER = ["exercise", "song", "classical", "air", "jig", "slip jig", "reel", "hornpipe", "polka", "slide", "set dance", "waltz", "march", "other"];
+  const R_ALIASES = { "slow air": "air", air: "air", "single jig": "jig", "double jig": "jig", slipjig: "slip jig", valse: "waltz", barndance: "hornpipe", strathspey: "other" };
 
   const $ = (id) => document.getElementById(id);
   const store = {
@@ -40,7 +40,8 @@
   const state = {
     lang: I18N[prefs.lang] ? prefs.lang : detectLang(),
     search: prefs.search || "",
-    level: prefs.level || "",
+    level: prefs.level === "mine" ? "" : prefs.level || "",
+    source: prefs.level === "mine" ? "mine" : prefs.source || "",
     rhythm: prefs.rhythm || "",
     fits: !!prefs.fits,
     tab: !!prefs.tab,
@@ -57,7 +58,7 @@
     resumePct: null
   };
   function savePrefs() {
-    store.set("tww.prefs", { lang: state.lang, search: state.search, level: state.level, rhythm: state.rhythm, fits: state.fits, tab: state.tab, tuneId: state.tuneId, keyId: state.keyId, mode: state.mode, speed: state.speed, metro: state.metro, countIn: state.countIn, melody: state.melody, loop: state.loop });
+    store.set("tww.prefs", { lang: state.lang, search: state.search, level: state.level, source: state.source, rhythm: state.rhythm, fits: state.fits, tab: state.tab, tuneId: state.tuneId, keyId: state.keyId, mode: state.mode, speed: state.speed, metro: state.metro, countIn: state.countIn, melody: state.melody, loop: state.loop });
   }
 
   // ---------- Translation helpers ----------
@@ -109,14 +110,24 @@
   function prepare(t) {
     t.abcTitle = field(t.abc, "T");
     t.ki = keyInfo(t.abc);
+    // Imported tunes get an estimated level (see difficulty.js)
+    if (t.custom && !t.level) {
+      const d = window.TWW_DIFFICULTY && window.TWW_DIFFICULTY(ABCJS, t.abc, t.rk);
+      t.level = d ? d.level : 2;
+      t.auto = true;
+    }
     return t;
   }
-  const TUNES = (window.TWW_TUNES || []).map(t => prepare(Object.assign({}, t)));
-  custom = custom.filter(t => t && t.abc).map(t => prepare(Object.assign(t, { custom: true, rk: t.rk || rhythmOf(t.abc) })));
+  // Workshop tunes first, then the O'Neill's collection (separate file, GPL licence)
+  const TUNES = (window.TWW_TUNES || []).map(t => prepare(Object.assign({ src: "workshop" }, t)))
+    .concat((window.TWW_TUNES_ONEILL || []).map(t => prepare(Object.assign({ src: "oneill", auto: true }, t))));
+  custom = custom.filter(t => t && t.abc).map(t => prepare(Object.assign(t, { custom: true, src: "mine", rk: t.rk || rhythmOf(t.abc) })));
   const allTunes = () => TUNES.concat(custom);
   const titleOf = t => (t.title && (t.title[state.lang] || t.title.en)) || t.abcTitle || tr("untitled");
-  const descOf = t => t.custom ? tr("customDesc") : (t.desc ? t.desc[state.lang] || t.desc.en || "" : "");
-  const levelOf = t => t.custom ? tr("mine") : tr("level" + t.level);
+  const descOf = t => t.custom ? tr("customDesc")
+    : t.src === "oneill" ? tr("oneillDesc", t.n, field(t.abc, "Z"))
+    : (t.desc ? t.desc[state.lang] || t.desc.en || "" : "");
+  const levelOf = t => tr("level" + t.level);
   const norm = s => (s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
   // Alphabetical order ignores leading articles and punctuation ("The Kesh Jig" sorts under K)
   const sortKey = s => norm(s).replace(/^[^a-z0-9]+/, "").replace(/^(the|an|a|le|la|les|un|une|el|los|las|der|die|das|ein|eine) +|^l'/, "");
@@ -711,7 +722,8 @@
     const meter = field(t.abc, "M");
     if (meter) chips.push(`<span class="chip">${esc(meter)}</span>`);
     if (t.rk && t.rk !== "other") chips.push(`<span class="chip">${esc(rhythmName(t.rk))}</span>`);
-    chips.push(`<span class="chip">${esc(levelOf(t))}</span>`);
+    chips.push(`<span class="chip"${t.auto ? ` title="${esc(tr("levelAuto"))}"` : ""}>${esc(levelOf(t))}${t.auto ? " *" : ""}</span>`);
+    if (t.custom) chips.push(`<span class="chip">${esc(tr("mine"))}</span>`);
     $("tuneMeta").innerHTML = chips.join("");
     const fi = fitInfo(t), notes = [];
     if (fi.half) notes.push(tr("halfNotes", fi.half));
@@ -731,19 +743,22 @@
   }
 
   function fillSelects() {
-    const rCounts = {}, lCounts = {};
+    const rCounts = {}, lCounts = {}, sCounts = {};
     allTunes().forEach(t => {
       rCounts[t.rk] = (rCounts[t.rk] || 0) + 1;
-      const l = t.custom ? "mine" : String(t.level);
-      lCounts[l] = (lCounts[l] || 0) + 1;
+      lCounts[t.level] = (lCounts[t.level] || 0) + 1;
+      sCounts[t.src] = (sCounts[t.src] || 0) + 1;
     });
+    $("source").innerHTML = `<option value="">${esc(tr("allSources"))}</option>` + ["workshop", "oneill", "mine"]
+      .map(s => `<option value="${s}">${esc(tr("src_" + s))} (${sCounts[s] || 0})</option>`).join("");
+    $("source").value = state.source;
     $("rhythm").innerHTML = `<option value="">${esc(tr("allRhythms"))}</option>` + RHYTHM_ORDER
       .filter(r => rCounts[r])
       .map(r => `<option value="${r}">${esc(rhythmName(r))} (${rCounts[r]})</option>`).join("");
     $("rhythm").value = rCounts[state.rhythm] ? state.rhythm : "";
     state.rhythm = $("rhythm").value;
-    $("level").innerHTML = `<option value="">${esc(tr("allLevels"))}</option>` + ["1", "2", "3", "mine"]
-      .map(l => `<option value="${l}">${esc(l === "mine" ? tr("mine") : tr("level" + l))} (${lCounts[l] || 0})</option>`).join("");
+    $("level").innerHTML = `<option value="">${esc(tr("allLevels"))}</option>` + ["1", "2", "3"]
+      .map(l => `<option value="${l}">${esc(tr("level" + l))} (${lCounts[l] || 0})</option>`).join("");
     $("level").value = state.level;
     $("search").value = state.search;
     $("fits").checked = state.fits;
@@ -757,7 +772,8 @@
   function renderResults() {
     const q = norm(state.search).trim();
     const list = allTunes().filter(t => {
-      if (state.level === "mine" ? !t.custom : state.level && String(t.level) !== state.level) return false;
+      if (state.source && t.src !== state.source) return false;
+      if (state.level && String(t.level) !== state.level) return false;
       if (state.rhythm && t.rk !== state.rhythm) return false;
       if (q && !searchText(t).includes(q)) return false;
       if (state.fits && !fitInfo(t).ok) return false;
@@ -797,6 +813,7 @@
     searchTimer = setTimeout(() => { state.search = e.target.value; savePrefs(); renderResults(); }, 120);
   });
   $("level").addEventListener("change", e => { state.level = e.target.value; savePrefs(); renderResults(); });
+  $("source").addEventListener("change", e => { state.source = e.target.value; savePrefs(); renderResults(); });
   $("rhythm").addEventListener("change", e => { state.rhythm = e.target.value; savePrefs(); renderResults(); });
   $("fits").addEventListener("change", e => { state.fits = e.target.checked; savePrefs(); renderResults(); });
 
@@ -840,7 +857,7 @@
     } catch (e) { return false; }
   }
   // Two tunes are the same if they match apart from X:, R:, comments and spacing
-  const sameKey = abc => abc.replace(/^(X|R):.*$/gm, "").replace(/^%.*$/gm, "").replace(/\s+/g, "");
+  const sameKey = abc => abc.replace(/^(X|R|Q|B|Z):.*$/gm, "").replace(/^%.*$/gm, "").replace(/\s+/g, "");
   // Adds every readable tune of the text to "My tunes", skipping ones already in the bank
   function importAbc(text) {
     const parts = splitAbc(text);
@@ -852,7 +869,7 @@
       if (known.has(k)) { res.dup++; return; }
       known.add(k);
       const id = "mine-" + Date.now().toString(36) + "-" + i;
-      custom.push(prepare({ id, rk: rhythmOf(abc), abc, custom: true }));
+      custom.push(prepare({ id, rk: rhythmOf(abc), abc, custom: true, src: "mine" }));
       res.added++;
       if (!res.firstId) res.firstId = id;
     });
@@ -894,7 +911,9 @@
   function exportAbc(list, fileName, withLicence) {
     const day = new Date().toISOString().slice(0, 10);
     const head = ["%abc-2.1", `% ${tr("title")}: https://remim-dev.github.io/tin-whistle-workshop/`, `% ${day}, tunes: ${list.length}`];
-    if (withLicence) head.push("% ABC transcriptions by remim-dev, CC BY-NC-SA 4.0: https://creativecommons.org/licenses/by-nc-sa/4.0/");
+    if (withLicence) head.push(
+      "% Workshop transcriptions by remim-dev, CC BY-NC-SA 4.0: https://creativecommons.org/licenses/by-nc-sa/4.0/",
+      "% Tunes with B:O'Neill's Music of Ireland: O'Neill's Project transcriptions (transcriber in Z:), GNU GPL v2 or later");
     const body = list.map((t, i) => {
       let abc = t.abc.trim().replace(/^X:.*$/m, "X:" + (i + 1));
       if (!/^R:/m.test(abc) && t.rk && t.rk !== "other") abc = abc.replace(/^(T:.*)$/m, "$1\nR:" + t.rk);

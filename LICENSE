@@ -1,7 +1,8 @@
 Tin Whistle Workshop
 Copyright (c) 2026 remim-dev (https://github.com/remim-dev)
 
-This work (code, interface texts and ABC tune transcriptions) is licensed under
+This work (code, interface texts and ABC tune transcriptions), except the
+file tunes-oneill.js described below, is licensed under
 the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International
 License (CC BY-NC-SA 4.0): https://creativecommons.org/licenses/by-nc-sa/4.0/
 
@@ -11,6 +12,16 @@ contributions under the same licence.
 
 The tunes themselves are traditional or in the public domain; this licence
 covers the transcriptions and arrangements written for this project.
+
+Exception: tunes-oneill.js
+  The file tunes-oneill.js holds 200 tunes from Francis O'Neill's "The Music
+  of Ireland" (1903, public domain), in the ABC transcriptions of the
+  O'Neill's Project (copyright 1997-2000 by its contributors, see the Z: line
+  of each tune), https://trillian.mit.edu/~jc/music/book/ONeills/ .
+  That file is distributed under the GNU General Public License, version 2
+  or (at your option) any later version, as the O'Neill's Project requires.
+  See LICENSE-GPL-2.0.txt. It is a separate collection that the app loads
+  next to its own files; the CC BY-NC-SA licence does not apply to it.
 
 Third-party components keep their own licences: abcjs (MIT), loaded from
 cdnjs; Atkinson Hyperlegible, IBM Plex Mono and Uncial Antiqua fonts
