@@ -665,6 +665,8 @@
       return;
     }
     const resuming = state.paused;
+    // The microphone would hear the melody
+    if (train.on) trainStop();
     state.playing = true;
     setPlayUI();
     if (!resuming && state.metro && state.countIn) {
@@ -844,6 +846,165 @@
     showNote(info);
     synth.note(info.sounding, 700);
   });
+
+  // ---------- Microphone practice ----------
+  // Asks for a note, listens through the microphone and recognises the pitch (YIN method).
+  // The sound is analysed in the browser only: it is never recorded or sent.
+  // Pools of notes, as semitones above the lowest note of the whistle: [scale notes, half-holes and C natural]
+  const TRAIN_POOLS = {
+    low: [[0, 2, 4, 5, 7, 9, 11], [1, 3, 6, 8, 10]],
+    high: [[12, 14, 16, 17, 19, 21], [15, 18, 20, 22]],
+    oct: [[0, 2, 4, 5, 7, 9], [3, 6, 8, 10]]
+  };
+  const train = { on: false, stream: null, src: null, an: null, buf: null, raf: 0, target: 0, queue: [], lastBase: null, held: 0, quiet: 0, stable: { midi: null, n: 0 }, score: 0, done: false, t0: 0 };
+  const mtof = m => 440 * Math.pow(2, (m - 69) / 12);
+
+  // Fundamental frequency of x (YIN: cumulative mean normalised difference), or 0 if no clear pitch
+  function detectPitch(x, sr, fmin, fmax) {
+    let rms = 0;
+    for (let i = 0; i < x.length; i++) rms += x[i] * x[i];
+    rms = Math.sqrt(rms / x.length);
+    if (rms < 0.01) return { f: 0, rms };
+    const tMin = Math.max(2, Math.floor(sr / fmax)), tMax = Math.min(x.length >> 1, Math.ceil(sr / fmin));
+    const w = x.length - tMax - 1, d = new Float32Array(tMax + 2);
+    let sum = 0;
+    d[0] = 1;
+    for (let t = 1; t <= tMax + 1; t++) {
+      let s = 0;
+      for (let i = 0; i < w; i++) { const v = x[i] - x[i + t]; s += v * v; }
+      sum += s;
+      d[t] = sum ? s * t / sum : 1;
+    }
+    let t = -1;
+    for (let i = tMin; i <= tMax; i++) {
+      if (d[i] < 0.15) { while (i < tMax && d[i + 1] < d[i]) i++; t = i; break; }
+    }
+    if (t < 0) return { f: 0, rms };
+    const a = d[t - 1], b = d[t], c = d[t + 1], den = a - 2 * b + c;
+    const tau = t + (den ? (a - c) / (2 * den) : 0);
+    return { f: sr / tau, rms };
+  }
+
+  function trainSay(cls, key, ...args) {
+    const text = key ? tr(key, ...args) : "";
+    if ($("trainMsg").textContent !== text) say($("trainMsg"), cls, text);
+  }
+  function showTrainTarget() {
+    const k = currentKey(), off = train.target, pc = (k.base + off) % 12;
+    $("trainNote").textContent = train.on ? noteName(pc) + (off >= 12 ? " +" : "") : "–";
+    $("trainOctave").textContent = train.on ? tr("octave", off >= 12 ? 2 : 1) : "";
+    $("trainFing").innerHTML = train.on && $("trainShowFing").checked
+      ? whistleSVG(fingeringFor(off), { horizontal: true, octave2: off >= 12, aria: tr("fingeringOf", noteName(pc)) }) : "";
+    $("trainScore").textContent = train.on ? tr("trainScore", train.score) : "";
+  }
+  function pickTarget() {
+    const mode = $("trainMode").value, pools = TRAIN_POOLS[mode] || TRAIN_POOLS.low;
+    if (!train.queue.length) {
+      const pool = pools[0].concat($("trainExtras").checked ? pools[1] : []);
+      let off;
+      do { off = pool[Math.floor(Math.random() * pool.length)]; } while (pool.length > 1 && off === train.lastBase);
+      train.lastBase = off;
+      // Octave mode: the same note low, then high
+      train.queue = mode === "oct" ? [off, off + 12] : [off];
+    }
+    train.target = train.queue.shift();
+    train.held = 0;
+    train.done = false;
+    $("trainTarget").classList.remove("ok");
+    showTrainTarget();
+    trainSay("", "trainListening");
+  }
+  function showHeard(midi, cents) {
+    const k = currentKey(), off = midi - 12 - k.base;
+    $("trainHeard").textContent = midi == null ? "–" : noteName(((midi % 12) + 12) % 12) + (off >= 12 && off <= 23 ? " +" : "");
+    $("trainHeardOct").textContent = midi == null ? "" : off >= 0 && off <= 23 ? tr("octave", off >= 12 ? 2 : 1) : tr("trainOut");
+    $("trainCents").textContent = midi == null ? "" : tr("trainCents", cents);
+    const n = $("trainNeedle");
+    n.classList.toggle("on", midi != null);
+    if (midi != null) n.style.left = (50 + cents * 0.9) + "%";
+  }
+  function trainLoop() {
+    if (!train.on) return;
+    train.raf = requestAnimationFrame(trainLoop);
+    const now = performance.now(), dt = train.t0 ? Math.min(100, now - train.t0) : 16;
+    train.t0 = now;
+    train.an.getFloatTimeDomainData(train.buf);
+    const k = currentKey();
+    // Search from a little below the lowest note to a little above the top of the second octave
+    const res = detectPitch(train.buf, synth.ctx.sampleRate, mtof(k.base + 10), mtof(k.base + 38));
+    $("trainLevel").style.width = Math.min(100, res.rms * 500) + "%";
+    if (!res.f) {
+      train.held = 0;
+      train.stable = { midi: null, n: 0 };
+      train.quiet += dt;
+      if (train.quiet > 400) showHeard(null);
+      if (train.quiet > 4000 && !train.done) trainSay("", "trainNoSound");
+      return;
+    }
+    train.quiet = 0;
+    const m = 69 + 12 * Math.log2(res.f / 440), r = Math.round(m), cents = Math.round((m - r) * 100);
+    // A note counts once the same pitch has been heard on a few frames in a row
+    if (r === train.stable.midi) train.stable.n++; else train.stable = { midi: r, n: 1 };
+    if (train.stable.n < 4) return;
+    showHeard(r, cents);
+    if (train.done) return;
+    const want = k.base + 12 + train.target;
+    if (r === want) {
+      train.held += dt;
+      if (train.held < 400) return;
+      train.done = true;
+      train.score++;
+      $("trainTarget").classList.add("ok");
+      $("trainScore").textContent = tr("trainScore", train.score);
+      trainSay("ok", "trainGood");
+      setTimeout(() => { if (train.on) pickTarget(); }, 900);
+    } else {
+      train.held = 0;
+      if ((r - want) % 12 === 0) trainSay("err", "trainWrongOct", r < want);
+      else trainSay("err", "trainWrong");
+    }
+  }
+  async function trainStart() {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { trainSay("err", "trainNoMic"); return; }
+    try {
+      // Raw sound: the browser's voice processing would distort a whistle
+      train.stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false } });
+    } catch (e) { trainSay("err", "trainMicError"); return; }
+    // The melody would be heard by the microphone
+    if (state.playing || state.paused) { hardStop(); resetDisplay(); }
+    synth.init();
+    train.src = synth.ctx.createMediaStreamSource(train.stream);
+    train.an = synth.ctx.createAnalyser();
+    train.an.fftSize = 2048;
+    train.buf = new Float32Array(train.an.fftSize);
+    train.src.connect(train.an);
+    Object.assign(train, { on: true, score: 0, queue: [], held: 0, quiet: 0, t0: 0, stable: { midi: null, n: 0 } });
+    $("trainStartLabel").textContent = tr("trainStop");
+    $("trainSkip").disabled = false;
+    pickTarget();
+    trainLoop();
+  }
+  function trainStop() {
+    train.on = false;
+    cancelAnimationFrame(train.raf);
+    if (train.stream) train.stream.getTracks().forEach(t => t.stop());
+    if (train.src) train.src.disconnect();
+    train.stream = train.src = null;
+    $("trainStartLabel").textContent = tr("trainStart");
+    $("trainSkip").disabled = true;
+    $("trainTarget").classList.remove("ok");
+    $("trainLevel").style.width = "0";
+    showHeard(null);
+    showTrainTarget();
+    trainSay("", null);
+  }
+  $("trainStart").addEventListener("click", () => { if (train.on) trainStop(); else trainStart(); });
+  $("trainSkip").addEventListener("click", () => { if (train.on) pickTarget(); });
+  $("trainMode").addEventListener("change", () => { train.queue = []; if (train.on) pickTarget(); });
+  $("trainExtras").addEventListener("change", () => { train.queue = []; if (train.on) pickTarget(); });
+  $("trainShowFing").addEventListener("change", showTrainTarget);
+  // The microphone stops when the panel is closed
+  $("trainPanel").addEventListener("toggle", () => { if (!$("trainPanel").open && train.on) trainStop(); });
 
   // ---------- Technique guide (texts in guide.js) ----------
   // Built when the panel opens: abcjs cannot lay out a score inside a closed panel
@@ -1047,8 +1208,11 @@
     updateSelButtons();
     renderTune();
     if ($("guidePanel").open) renderGuide(); else guideLang = null;
+    $("trainStartLabel").textContent = tr(train.on ? "trainStop" : "trainStart");
+    showTrainTarget();
+    if (train.on && !train.done) trainSay("", "trainListening");
   });
-  $("whistleKey").addEventListener("change", e => { state.keyId = e.target.value; savePrefs(); renderTune(); renderResults(); });
+  $("whistleKey").addEventListener("change", e => { state.keyId = e.target.value; savePrefs(); renderTune(); renderResults(); showTrainTarget(); });
   $("modeSame").addEventListener("click", () => { state.mode = "same"; savePrefs(); renderTune(); renderResults(); });
   $("modeReal").addEventListener("click", () => { state.mode = "real"; savePrefs(); renderTune(); renderResults(); });
   function setView(tab) {

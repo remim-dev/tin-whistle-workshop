@@ -233,6 +233,26 @@ textarea { width: 100%; min-height: 170px; font-family: var(--font-mono); font-s
 @media (max-width: 820px) {
   .top-side { align-items: flex-start; }
 }
+/* Entraînement au micro */
+.train { display: flex; flex-direction: column; gap: 12px; margin-top: 12px; }
+.train-ctrl { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; }
+.train-ctrl select { width: auto; max-width: 100%; }
+.train-stage { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
+.train-box { background: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 6px; align-items: center; text-align: center; min-height: 200px; min-width: 0; }
+.train-box .big { font-family: var(--font-display); font-size: 52px; line-height: 1.1; color: var(--green); }
+.train-box.ok { border-color: var(--green); background: var(--green-soft); }
+#trainFing { width: 100%; max-width: 340px; }
+#trainFing svg { width: 100%; height: auto; display: block; }
+.meter { position: relative; width: 100%; max-width: 260px; height: 16px; border-radius: 8px; margin-top: 6px; background: linear-gradient(90deg, var(--accent-soft), var(--green-soft) 35%, var(--green-soft) 65%, var(--accent-soft)); display: flex; justify-content: space-between; align-items: center; padding: 0 6px; font-size: 11px; color: var(--muted); }
+.meter i { position: absolute; top: -3px; left: 50%; width: 3px; height: 22px; border-radius: 2px; background: var(--ink); transform: translateX(-50%); opacity: 0; }
+.meter i.on { opacity: 1; }
+.level { width: 100%; max-width: 260px; height: 4px; border-radius: 2px; background: var(--line); overflow: hidden; margin-top: 4px; }
+.level i { display: block; height: 100%; width: 0; background: var(--green); }
+@media (max-width: 820px) {
+  .train-stage { grid-template-columns: minmax(0, 1fr); }
+  .train-box { min-height: 0; }
+}
+
 /* Guide technique */
 .guide-link { color: var(--green); font-weight: 700; font-size: 14px; }
 .guide { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 8px 28px; margin-top: 14px; }
@@ -403,6 +423,44 @@ textarea { width: 100%; min-height: 170px; font-family: var(--font-mono); font-s
       <p class="hint" data-i18n="scoreHint"></p>
     </section>
   </main>
+
+  <details class="panel" id="trainPanel">
+    <summary><span data-i18n="trainTitle"></span> <small data-i18n="trainSub"></small></summary>
+    <div class="train">
+      <div class="train-ctrl">
+        <select id="trainMode" data-i18n-aria="trainModeAria">
+          <option value="low" data-i18n="trainLow"></option>
+          <option value="high" data-i18n="trainHigh"></option>
+          <option value="oct" data-i18n="trainOct"></option>
+        </select>
+        <label class="switch"><input type="checkbox" id="trainExtras"><span data-i18n="trainExtras"></span></label>
+        <label class="switch"><input type="checkbox" id="trainShowFing" checked><span data-i18n="trainShowFing"></span></label>
+      </div>
+      <div class="row">
+        <button type="button" class="btn primary" id="trainStart"><svg viewBox="0 0 16 16"><path d="M8 1a2.5 2.5 0 0 0-2.5 2.5v4a2.5 2.5 0 0 0 5 0v-4A2.5 2.5 0 0 0 8 1zM3.5 7a.75.75 0 0 0-1.5 0 6 6 0 0 0 5.25 5.95V15h1.5v-2.05A6 6 0 0 0 14 7a.75.75 0 0 0-1.5 0 4.5 4.5 0 0 1-9 0z"/></svg><span id="trainStartLabel" data-i18n="trainStart"></span></button>
+        <button type="button" class="btn" id="trainSkip" disabled data-i18n="trainSkip"></button>
+        <span class="hint" id="trainScore"></span>
+      </div>
+      <div class="train-stage">
+        <div class="train-box" id="trainTarget">
+          <span class="label" data-i18n="trainPlay"></span>
+          <div class="big" id="trainNote">–</div>
+          <div class="note-en" id="trainOctave"></div>
+          <div id="trainFing"></div>
+        </div>
+        <div class="train-box" id="trainHeardBox">
+          <span class="label" data-i18n="trainHeard"></span>
+          <div class="big" id="trainHeard">–</div>
+          <div class="note-en" id="trainHeardOct"></div>
+          <div class="meter" aria-hidden="true"><span>♭</span><i id="trainNeedle"></i><span>♯</span></div>
+          <div class="note-en" id="trainCents"></div>
+          <div class="level" aria-hidden="true"><i id="trainLevel"></i></div>
+        </div>
+      </div>
+      <p class="msg" id="trainMsg" role="status"></p>
+      <p class="hint" data-i18n="trainPrivacy"></p>
+    </div>
+  </details>
 
   <details class="panel" id="chartPanel" open>
     <summary><span data-i18n="chart"></span> <small id="chartSub"></small></summary>
