@@ -840,6 +840,91 @@
     synth.note(info.sounding, 700);
   });
 
+  // ---------- Technique guide (texts in guide.js) ----------
+  // Built when the panel opens: abcjs cannot lay out a score inside a closed panel
+  let guideLang = null;
+  const SKIN = 'fill="rgba(214,160,120,.9)" stroke="rgba(120,80,50,.8)" stroke-width="1.5"';
+  // "Label: detail" becomes two centred lines
+  function svgLabel(x, y, text) {
+    const [a, b] = String(text).split(/:\s*/);
+    return `<text x="${x}" y="${y}" text-anchor="middle" font-size="13" font-family="var(--font-body)" fill="var(--ink)">
+      <tspan x="${x}" font-weight="700">${esc(a)}</tspan>${b ? `<tspan x="${x}" dy="16" fill="var(--muted)">${esc(b)}</tspan>` : ""}</text>`;
+  }
+  function guideFig(name, L) {
+    const hole = (x, y, r) => `<circle cx="${x}" cy="${y}" r="${r}" fill="var(--hole-open)" stroke="var(--hole-ring)" stroke-width="2.5"/>`;
+    const tubeH = (x0, x1, y) => `<rect x="${x0}" y="${y - 26}" width="${x1 - x0}" height="52" rx="6" fill="var(--tube-b)" stroke="var(--tube-edge)"/>`;
+    const tubeV = (x, y0, y1) => `<rect x="${x - 28}" y="${y0}" width="56" height="${y1 - y0}" rx="6" fill="var(--tube-b)" stroke="var(--tube-edge)"/>`;
+    const svg = (vb, body) => `<svg viewBox="${vb}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${esc(tr("guideTitle"))}">${body}</svg>`;
+    if (name === "hands") return whistleSVG("XXXXXX", { labels: true, horizontal: true, aria: tr("fingering") });
+    if (name === "pad") {
+      return svg("0 0 460 170",
+        tubeH(10, 220, 70) + hole(115, 70, 15) + `<ellipse cx="115" cy="70" rx="36" ry="28" ${SKIN}/>` +
+        `<text x="200" y="36" font-size="26" fill="var(--green)" text-anchor="middle">✓</text>` + svgLabel(115, 128, L.pad) +
+        tubeH(240, 450, 70) + hole(345, 70, 15) + `<ellipse cx="345" cy="46" rx="17" ry="22" ${SKIN}/>` +
+        `<path d="M333 92 q-6 10 0 18 M345 94 q-6 10 0 18 M357 92 q-6 10 0 18" fill="none" stroke="var(--warn)" stroke-width="2" stroke-linecap="round"/>` +
+        `<text x="430" y="36" font-size="26" fill="var(--warn)" text-anchor="middle">✗</text>` + svgLabel(345, 128, L.tip));
+    }
+    if (name === "breath") {
+      const zones = [[20, 130, "var(--line)", L.tooSoft], [130, 300, "var(--green-soft)", L.oct1], [300, 450, "var(--green)", L.oct2], [450, 540, "var(--accent-soft)", L.tooHard]];
+      return svg("0 0 560 130", zones.map(([a, b, c, t], i) => {
+        const [h, d] = String(t).split(/:\s*/), x = (a + b) / 2, ink = i === 2 ? "var(--surface)" : "var(--ink)";
+        return `<rect x="${a}" y="14" width="${b - a}" height="52" fill="${c}" ${i === 0 ? 'rx="8"' : i === 3 ? 'rx="8"' : ""}/>
+          <text x="${x}" y="${d ? 36 : 45}" text-anchor="middle" font-size="13" font-weight="700" fill="${ink}" font-family="var(--font-body)">${esc(h)}</text>
+          ${d ? `<text x="${x}" y="54" text-anchor="middle" font-size="12" fill="${ink}" font-family="var(--font-body)">${esc(d)}</text>` : ""}`;
+      }).join("") +
+        `<line x1="20" y1="92" x2="530" y2="92" stroke="var(--muted)" stroke-width="2"/><path d="M540 92 l-12 -6 v12 z" fill="var(--muted)"/>` +
+        `<text x="280" y="118" text-anchor="middle" font-size="13" fill="var(--muted)" font-family="var(--font-body)">${esc(L.air)}</text>`);
+    }
+    if (name === "half") {
+      const fingers = [[80, 58, L.closed], [230, 80, L.half], [380, null, L.open]];
+      return svg("0 0 460 160", fingers.map(([x, fy, t]) =>
+        tubeV(x, 6, 112) + hole(x, 58, 17) + (fy ? `<ellipse cx="${x}" cy="${fy}" rx="30" ry="${fy === 58 ? 26 : 22}" ${SKIN}/>` : "") +
+        svgLabel(x, 134, t)).join("") +
+        `<path d="M276 46 v34 m-7 -9 l7 9 l7 -9" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>`);
+    }
+    return "";
+  }
+  // A fingering on the D whistle, OFF semitones above low D; F overrides the usual fingering
+  function guideNote(off, f) {
+    const pc = (D_BASE + off) % 12, alt = altName(pc), name = noteName(pc) + (off >= 12 ? " +" : "");
+    return `<button type="button" class="cell" data-goff="${off}" aria-label="${esc(name)}">
+      ${whistleSVG(f || fingeringFor(off), { octave2: off >= 12, aria: noteName(pc) })}
+      <b>${esc(name)}</b>${alt ? `<small>${esc(alt)}</small>` : ""}</button>`;
+  }
+  function renderGuide() {
+    const G = window.TWW_GUIDE || {}, g = G[state.lang] || G.en;
+    if (!g) return;
+    guideLang = state.lang;
+    const fill = html => html
+      .replace(/\[\[n:(\d+):([XOH]{6})\]\]/g, (m, off, f) => `<span class="or">${esc(g.labels.alt)}</span>` + guideNote(+off, f))
+      .replace(/\[\[n:(\d+)\]\]/g, (m, off) => guideNote(+off))
+      .replace(/\[\[fig:(\w+)\]\]/g, (m, n) => `<figure class="fig-${n}">${guideFig(n, g.labels)}</figure>`)
+      .replace(/\[\[abc:(\w+)\]\]/g, (m, n) => `<div class="abc"><div data-abc="${n}"></div></div>`)
+      .replace(/\[\[tune:([\w-]+)\]\]/g, (m, id) => {
+        const t = allTunes().find(x => x.id === id);
+        return t ? `<button type="button" class="btn small" data-tune="${esc(id)}">${esc(titleOf(t))}</button>` : "";
+      });
+    $("guide").innerHTML = `<nav aria-label="${esc(tr("guideTitle"))}">${g.sections.map(s => `<a href="#g-${s.id}">${esc(s.h)}</a>`).join("")}</nav>
+      <div class="guide-body">${g.sections.map(s => `<section id="g-${s.id}"><h3>${esc(s.h)}</h3>${fill(s.body)}</section>`).join("")}</div>`;
+    if (!window.ABCJS) return;
+    $("guide").querySelectorAll("[data-abc]").forEach(el => {
+      ABCJS.renderAbc(el, (window.TWW_GUIDE_ABC || {})[el.dataset.abc] || "", { responsive: "resize", staffwidth: 400, paddingtop: 4, paddingbottom: 4, paddingleft: 4, paddingright: 4 });
+    });
+  }
+  $("guidePanel").addEventListener("toggle", () => { if ($("guidePanel").open && guideLang !== state.lang) renderGuide(); });
+  $("guideLink").addEventListener("click", () => { $("guidePanel").open = true; });
+  $("guide").addEventListener("click", e => {
+    const c = e.target.closest("[data-goff]");
+    if (c && !state.playing) { synth.note(D_BASE + +c.dataset.goff + 12, 700); return; }
+    const b = e.target.closest("[data-tune]");
+    if (!b) return;
+    state.tuneId = b.dataset.tune;
+    savePrefs();
+    renderResults();
+    renderTune();
+    document.querySelector(".stage").scrollIntoView({ block: "start" });
+  });
+
   // ---------- Personal tunes ----------
   function saveCustom() {
     store.set("tww.custom", custom.map(t => ({ id: t.id, rk: t.rk, abc: t.abc })));
@@ -956,6 +1041,7 @@
     fillSelects();
     updateSelButtons();
     renderTune();
+    if ($("guidePanel").open) renderGuide(); else guideLang = null;
   });
   $("whistleKey").addEventListener("change", e => { state.keyId = e.target.value; savePrefs(); renderTune(); renderResults(); });
   $("modeSame").addEventListener("click", () => { state.mode = "same"; savePrefs(); renderTune(); renderResults(); });

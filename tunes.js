@@ -10,8 +10,9 @@
 //   desc   short description per language (English is the fallback)
 //   abc    the tune, written for a D whistle
 window.TWW_TUNES = [
+  // Exercises. Titles start with their series and number so they sort together.
   { id: "scale", level: 1, rk: "exercise",
-    title: { en: "D scale over two octaves", fr: "Gamme de Ré sur deux octaves", es: "Escala de Re en dos octavas", de: "D-Dur-Tonleiter über zwei Oktaven" },
+    title: { en: "Scale 1: D major over two octaves", fr: "Gamme 1 : Ré majeur sur deux octaves", es: "Escala 1: Re mayor en dos octavas", de: "Tonleiter 1: D-Dur über zwei Oktaven" },
     desc: {
       en: "The whole range of the whistle: the first octave, then the same scale again, blowing harder.",
       fr: "Toute l'étendue de la flûte : la 1ʳᵉ octave, puis la même gamme en soufflant plus fort.",
@@ -25,6 +26,194 @@ L:1/4
 Q:1/4=70
 K:D
 D E F G | A B c d | e f g a | b4 | b a g f | e d c B | A G F E | D4 |]` },
+
+  { id: "ex-thirds", level: 1, rk: "exercise",
+    title: { en: "Scale 2: thirds in D", fr: "Gamme 2 : tierces en Ré", es: "Escala 2: terceras en Re", de: "Tonleiter 2: Terzen in D" },
+    desc: {
+      en: "The scale in skips of a third: two fingers move at once. Keep the fingers close to the holes.",
+      fr: "La gamme par sauts de tierce : deux doigts bougent à la fois. Gardez les doigts près des trous.",
+      es: "La escala por saltos de tercera: se mueven dos dedos a la vez. Mantén los dedos cerca de los agujeros.",
+      de: "Die Tonleiter in Terzsprüngen: zwei Finger bewegen sich gleichzeitig. Halte die Finger nah an den Löchern."
+    },
+    abc: `X:1
+T:Thirds in D
+M:4/4
+L:1/8
+Q:1/4=66
+K:D
+D F E G F A G B | A c B d c e d2 | d B c A B G A F | G E F D E2 D2 |]` },
+
+  { id: "ex-gscale", level: 1, rk: "exercise",
+    title: { en: "Scale 3: G major (C natural)", fr: "Gamme 3 : Sol majeur (Do naturel)", es: "Escala 3: Sol mayor (Do natural)", de: "Tonleiter 3: G-Dur (mit C)" },
+    desc: {
+      en: "The scale of G uses C natural, played with a cross-fingering: hole 1 open, holes 2 and 3 covered.",
+      fr: "La gamme de Sol utilise le Do naturel, joué en doigté croisé : trou 1 ouvert, trous 2 et 3 bouchés.",
+      es: "La escala de Sol usa el Do natural, con digitación cruzada: agujero 1 abierto, agujeros 2 y 3 tapados.",
+      de: "Die G-Dur-Tonleiter braucht das C, gespielt mit Gabelgriff: Loch 1 offen, Löcher 2 und 3 gedeckt."
+    },
+    abc: `X:1
+T:G major scale
+M:4/4
+L:1/4
+Q:1/4=70
+K:G
+G A B c | d e f g | g f e d | c B A G |
+B c B A | G A B c | d c B A | G4 |]` },
+
+  { id: "ex-jigscale", level: 1, rk: "exercise",
+    title: { en: "Scale 4: in jig rhythm", fr: "Gamme 4 : en rythme de jig", es: "Escala 4: en ritmo de jig", de: "Tonleiter 4: im Jig-Rhythmus" },
+    desc: {
+      en: "The D scale in groups of three, long-short-long feel. Stress the first note of each group.",
+      fr: "La gamme de Ré par groupes de trois, à la manière d'une jig. Appuyez la première note de chaque groupe.",
+      es: "La escala de Re en grupos de tres, como una jig. Acentúa la primera nota de cada grupo.",
+      de: "Die D-Dur-Tonleiter in Dreiergruppen wie eine Jig. Betone die erste Note jeder Gruppe."
+    },
+    abc: `X:1
+T:Scale in jig rhythm
+M:6/8
+L:1/8
+Q:3/8=60
+K:D
+|: DED FEF | GFG AGA | BAB cBc | d3 z3 | dcd cBc | BAB AGA | GFG FEF | D3 z3 :|` },
+
+  { id: "ex-echo", level: 1, rk: "exercise",
+    title: { en: "Octaves 1: low and high echoes", fr: "Octaves 1 : échos grave et aigu", es: "Octavas 1: ecos grave y agudo", de: "Oktaven 1: Echo tief und hoch" },
+    desc: {
+      en: "Each phrase is played low, then repeated an octave higher with the same fingers. Only the breath changes.",
+      fr: "Chaque phrase est jouée dans le grave, puis répétée une octave plus haut avec les mêmes doigts. Seul le souffle change.",
+      es: "Cada frase se toca en el grave y luego una octava más alta con los mismos dedos. Solo cambia el soplo.",
+      de: "Jede Phrase erst tief, dann eine Oktave höher mit denselben Fingern. Nur der Atem ändert sich."
+    },
+    abc: `X:1
+T:Low and high echoes
+M:4/4
+L:1/4
+Q:1/4=72
+K:D
+D E F G | A4 | d e f g | a4 |
+A G F E | D4 | a g f e | d4 |
+F E D E | F2 A2 | f e d e | f2 a2 |
+G F E F | D4 | g f e f | d4 |]` },
+
+  { id: "ex-jumps", level: 2, rk: "exercise",
+    title: { en: "Octaves 2: octave jumps", fr: "Octaves 2 : sauts d'octave", es: "Octavas 2: saltos de octava", de: "Oktaven 2: Oktavsprünge" },
+    desc: {
+      en: "Tongue each note. Going up, speed up the air just as you tongue; going down, relax it without letting the note drop out.",
+      fr: "Détachez chaque note. En montant, accélérez l'air au moment du coup de langue ; en descendant, relâchez-le sans laisser tomber le son.",
+      es: "Ataca cada nota con la lengua. Al subir, acelera el aire en el golpe de lengua; al bajar, relájalo sin que se caiga el sonido.",
+      de: "Jede Note anstoßen. Aufwärts den Luftstrom beim Zungenstoß beschleunigen, abwärts entspannen, ohne dass der Ton abreißt."
+    },
+    abc: `X:1
+T:Octave jumps
+M:4/4
+L:1/4
+Q:1/4=66
+K:D
+D2 d2 | E2 e2 | F2 f2 | G2 g2 | A2 a2 | B2 b2 | A2 a2 | d4 |
+d2 D2 | e2 E2 | f2 F2 | g2 G2 | a2 A2 | b2 B2 | a2 A2 | D4 |]` },
+
+  { id: "ex-slurs", level: 2, rk: "exercise",
+    title: { en: "Octaves 3: slurred octaves", fr: "Octaves 3 : octaves liées", es: "Octavas 3: octavas ligadas", de: "Oktaven 3: gebundene Oktaven" },
+    desc: {
+      en: "No tonguing inside the slurs: the note must jump up and down with the breath alone, without a squeak.",
+      fr: "Pas de coup de langue dans les liaisons : la note doit monter et redescendre avec le seul souffle, sans couinement.",
+      es: "Sin golpe de lengua dentro de las ligaduras: la nota sube y baja solo con el soplo, sin chirridos.",
+      de: "Kein Zungenstoß unter dem Bogen: der Ton springt allein durch den Atem hoch und wieder runter, ohne Quietschen."
+    },
+    abc: `X:1
+T:Slurred octaves
+M:4/4
+L:1/8
+Q:1/4=60
+K:D
+(D2d2) (d2D2) | (E2e2) (e2E2) | (F2f2) (f2F2) | (G2g2) (g2G2) |
+(A2a2) (a2A2) | (B2b2) (b2B2) | (A2a2) (a2A2) | D8 |]` },
+
+  { id: "ex-long", level: 2, rk: "exercise",
+    title: { en: "Octaves 4: long high notes", fr: "Octaves 4 : notes longues dans l'aigu", es: "Octavas 4: notas largas agudas", de: "Oktaven 4: lange hohe Töne" },
+    desc: {
+      en: "Hold each high note steady for its full length, then breathe in the rest. Look for a clear, round sound rather than a loud one.",
+      fr: "Tenez chaque note aiguë stable sur toute sa durée, puis respirez dans le silence. Cherchez un son clair et rond plutôt que fort.",
+      es: "Mantén cada nota aguda estable toda su duración y respira en el silencio. Busca un sonido claro y redondo, no fuerte.",
+      de: "Jeden hohen Ton über die ganze Länge ruhig halten, in der Pause atmen. Gesucht ist ein klarer, runder Ton, kein lauter."
+    },
+    abc: `X:1
+T:Long high notes
+M:4/4
+L:1/4
+Q:1/4=60
+K:D
+d3 z | e3 z | f3 z | g3 z | a3 z | b3 z |
+a3 z | g3 z | f3 z | e3 z | d4- | d3 z |]` },
+
+  { id: "ex-fnat", level: 2, rk: "exercise",
+    title: { en: "Half-holes 1: F natural", fr: "Demi-trous 1 : Fa naturel", es: "Medios agujeros 1: Fa natural", de: "Halblöcher 1: F" },
+    desc: {
+      en: "F natural: holes 1 to 4 covered, hole 5 half covered. Slide the finger down rather than lifting it.",
+      fr: "Fa naturel : trous 1 à 4 bouchés, trou 5 à moitié. Faites glisser le doigt vers le bas plutôt que de le lever.",
+      es: "Fa natural: agujeros 1 a 4 tapados, el 5 a medias. Desliza el dedo hacia abajo en vez de levantarlo.",
+      de: "F: Löcher 1 bis 4 gedeckt, Loch 5 halb. Den Finger nach unten wegschieben statt ihn anzuheben."
+    },
+    abc: `X:1
+T:F natural
+M:4/4
+L:1/4
+Q:1/4=63
+K:D
+D E =F E | D E =F2 | =F G A G | =F E D2 |
+A G =F G | A2 =F2 | E =F E D | D4 |
+d e =f e | d e =f2 | =f g a g | =f e d2 |]` },
+
+  { id: "ex-bflat", level: 2, rk: "exercise",
+    title: { en: "Half-holes 2: B flat", fr: "Demi-trous 2 : Si bémol", es: "Medios agujeros 2: Si bemol", de: "Halblöcher 2: B" },
+    desc: {
+      en: "B flat: hole 1 covered, hole 2 half covered, the others open. Played in both octaves.",
+      fr: "Si bémol : trou 1 bouché, trou 2 à moitié, les autres ouverts. Joué dans les deux octaves.",
+      es: "Si bemol: agujero 1 tapado, el 2 a medias y los demás abiertos. En las dos octavas.",
+      de: "B: Loch 1 gedeckt, Loch 2 halb, die anderen offen. In beiden Oktaven."
+    },
+    abc: `X:1
+T:B flat
+M:4/4
+L:1/4
+Q:1/4=63
+K:D
+G A _B A | G A _B2 | A _B A G | F E D2 |
+g a _b a | g a _b2 | a _b a g | f e d2 |]` },
+
+  { id: "ex-gsharp", level: 2, rk: "exercise",
+    title: { en: "Half-holes 3: G sharp", fr: "Demi-trous 3 : Sol dièse", es: "Medios agujeros 3: Sol sostenido", de: "Halblöcher 3: Gis" },
+    desc: {
+      en: "G sharp, in the key of A: holes 1 and 2 covered, hole 3 half covered.",
+      fr: "Sol dièse, en La majeur : trous 1 et 2 bouchés, trou 3 à moitié.",
+      es: "Sol sostenido, en La mayor: agujeros 1 y 2 tapados, el 3 a medias.",
+      de: "Gis, in A-Dur: Löcher 1 und 2 gedeckt, Loch 3 halb."
+    },
+    abc: `X:1
+T:G sharp
+M:4/4
+L:1/4
+Q:1/4=63
+K:A
+A G A B | A G F E | F G A B | A4 |
+a g a b | a g f e | f g a b | a4 |]` },
+
+  { id: "ex-chromatic", level: 3, rk: "exercise",
+    title: { en: "Half-holes 4: chromatic scale", fr: "Demi-trous 4 : gamme chromatique", es: "Medios agujeros 4: escala cromática", de: "Halblöcher 4: chromatische Tonleiter" },
+    desc: {
+      en: "Every semitone from low D to high D and back: four half-holes and the cross-fingered C. Go slowly and check each note against the whistle on the left.",
+      fr: "Tous les demi-tons du Ré grave au Ré aigu, aller et retour : quatre demi-trous et le Do en doigté croisé. Allez lentement et vérifiez chaque note sur la flûte de gauche.",
+      es: "Todos los semitonos del Re grave al Re agudo, ida y vuelta: cuatro medios agujeros y el Do con digitación cruzada. Ve despacio y comprueba cada nota en la flauta.",
+      de: "Alle Halbtöne vom tiefen zum hohen D und zurück: vier Halblöcher und das C mit Gabelgriff. Langsam spielen und jeden Ton an der Whistle links prüfen."
+    },
+    abc: `X:1
+T:Chromatic scale
+M:4/4
+L:1/4
+Q:1/4=56
+K:D
+D ^D E =F | ^F G ^G A | _B =B =c ^c | d4 |
+d ^c =c =B | _B A ^G G | ^F =F E ^D | D4 |]` },
 
   { id: "clair", level: 1, rk: "song",
     desc: {

@@ -6,7 +6,9 @@ A free web app for learning the Irish tin whistle. Pick a tune: the whistle on t
 
 ## Features
 
-- **218 tunes**: 18 workshop tunes (songs, airs, first Irish tunes) and **200 well-known tunes from O'Neill's *Music of Ireland*** (1903): jigs, reels, hornpipes, slip jigs, set dances, marches and airs. Filter by collection, level and type.
+- **229 tunes and exercises**: 29 workshop pieces (12 exercises, songs, airs, first Irish tunes) and **200 well-known tunes from O'Neill's *Music of Ireland*** (1903): jigs, reels, hornpipes, slip jigs, set dances, marches and airs. Filter by collection, level and type.
+- **Playing technique guide**, illustrated: holding the whistle, breath, tonguing, the second octave, half-holes, cross-fingering and ornaments (cuts, taps, rolls), with tappable fingerings and short scores.
+- **12 exercises**: scales (D, thirds, G with C natural, jig rhythm), octaves (echoes, jumps, slurs, long high notes) and half-holes (F natural, B flat, G sharp, chromatic scale), each linked from the guide.
 - **Automatic difficulty level** (beginner, intermediate, advanced), estimated from the tempo of the tune type, the share of second-octave notes, half-holes, cross-fingerings, leaps and ornaments (`difficulty.js`). Imported tunes get one too; estimated levels are marked with *.
 - **Live fingerings**: a large whistle diagram follows the score note by note, together with the next note. Badges flag the second octave, half-holes and cross-fingerings.
 - **Tab view**: a small whistle drawn under every note of the staff, highlighted as the tune plays.
@@ -36,13 +38,14 @@ An Internet connection is needed the first time, to load [abcjs](https://www.abc
 | `index.html` | Page layout and styles |
 | `app.js` | Application logic (score, timing, fingerings, audio) |
 | `i18n.js` | Interface translations |
-| `tunes.js` | The workshop tunes, in ABC notation |
+| `tunes.js` | The workshop tunes and exercises, in ABC notation |
+| `guide.js` | Texts of the playing technique guide, per language |
 | `tunes-oneill.js` | 200 tunes from O'Neill's *Music of Ireland* (GPL, see below) |
 | `difficulty.js` | Difficulty estimate, used by the app and to build `tunes-oneill.js` |
 
 ## Adding a language
 
-Copy the `en` block in `i18n.js`, give it the two-letter language code (`it`, `ga`, `nl`, …) and translate the values. Missing keys fall back to English. Also add `desc` (and, if useful, `title`) entries in that language to the tunes in `tunes.js`.
+Copy the `en` block in `i18n.js`, give it the two-letter language code (`it`, `ga`, `nl`, …) and translate the values. Missing keys fall back to English. Do the same for the guide in `guide.js`. Also add `desc` (and, if useful, `title`) entries in that language to the tunes in `tunes.js`.
 
 ## Adding tunes
 
@@ -66,7 +69,9 @@ Une application web libre pour apprendre la flûte irlandaise (tin whistle). Cho
 
 ### Fonctionnalités
 
-- **218 morceaux** : 18 morceaux de l'atelier (chansons, airs, premiers airs irlandais) et **200 airs connus du recueil O'Neill's *Music of Ireland*** (1903) : jigs, reels, hornpipes, slip jigs, set dances, marches et airs lents. Filtres par collection, niveau et type.
+- **229 morceaux et exercices** : 29 morceaux de l'atelier (12 exercices, chansons, airs, premiers airs irlandais) et **200 airs connus du recueil O'Neill's *Music of Ireland*** (1903) : jigs, reels, hornpipes, slip jigs, set dances, marches et airs lents. Filtres par collection, niveau et type.
+- **Guide des techniques de jeu** illustré : tenue de la flûte, souffle, coup de langue, deuxième octave, demi-trous, doigté croisé et ornements (coupés, frappés, roulés), avec des doigtés à toucher pour les entendre et de courtes partitions.
+- **12 exercices** : gammes (Ré, tierces, Sol avec Do naturel, rythme de jig), octaves (échos, sauts, liaisons, notes longues aiguës) et demi-trous (Fa naturel, Si bémol, Sol dièse, gamme chromatique), accessibles depuis le guide.
 - **Niveau de difficulté automatique** (débutant, intermédiaire, avancé), estimé d'après le tempo du type d'air, la part de notes en 2ᵉ octave, les demi-trous, les doigtés croisés, les sauts et les ornements (`difficulty.js`). Les morceaux importés en reçoivent un aussi ; les niveaux estimés sont marqués d'une *.
 - **Doigtés en direct** : un grand schéma de flûte suit la partition note par note, avec la note suivante. Des badges signalent la 2ᵉ octave, les demi-trous et les doigtés croisés.
 - **Mode tablature** : une mini-flûte sous chaque note de la portée, mise en évidence pendant la lecture.
@@ -91,7 +96,7 @@ Une connexion Internet est nécessaire au premier chargement, pour abcjs et les 
 
 ### Contribuer
 
-- **Une langue** : copiez le bloc `en` de `i18n.js` sous le code de la langue et traduisez les valeurs. Ajoutez aussi les descriptions des airs dans `tunes.js`.
+- **Une langue** : copiez le bloc `en` de `i18n.js` (et celui de `guide.js`) sous le code de la langue et traduisez les valeurs. Ajoutez aussi les descriptions des airs dans `tunes.js`.
 - **Un air** : seulement des airs traditionnels ou du domaine public, dans une transcription que vous avez écrite vous-même. Ne copiez pas d'airs depuis des collections en ligne soumises à leurs propres licences.
 
 ### Crédits et licence

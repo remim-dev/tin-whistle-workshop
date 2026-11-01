@@ -222,6 +222,37 @@ textarea { width: 100%; min-height: 170px; font-family: var(--font-mono); font-s
 @media (max-width: 820px) {
   .top-side { align-items: flex-start; }
 }
+/* Guide technique */
+.guide-link { color: var(--green); font-weight: 700; font-size: 14px; }
+.guide { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 8px 28px; margin-top: 14px; }
+.guide nav { position: sticky; top: 12px; align-self: start; display: flex; flex-direction: column; gap: 2px; }
+.guide nav a { color: var(--ink); text-decoration: none; padding: 5px 10px; border-radius: 6px; font-size: 14px; }
+.guide nav a:hover { background: var(--green-soft); }
+.guide-body { min-width: 0; max-width: 78ch; }
+.guide section { border-top: 1px solid var(--line); padding: 14px 0 6px; scroll-margin-top: 16px; }
+.guide section:first-child { border-top: 0; padding-top: 0; }
+.guide h3 { font-family: var(--font-display); font-weight: 400; font-size: 22px; margin: 0 0 8px; color: var(--green); }
+.guide p, .guide ul { margin: 0 0 10px; }
+.guide li { margin-bottom: 4px; }
+.guide .tip { background: var(--accent-soft); border-radius: 8px; padding: 8px 12px; font-size: 14px; }
+.guide figure { margin: 6px 0 14px; }
+.guide figure svg { display: block; width: 100%; height: auto; }
+.guide .fig-hands { max-width: 520px; }
+.guide .fig-pad, .guide .fig-half { max-width: 460px; }
+.guide .fig-breath { max-width: 560px; }
+.guide .figs { display: flex; flex-wrap: wrap; gap: 10px; margin: 6px 0 12px; align-items: center; }
+.guide .figs .cell { width: 64px; }
+.guide .figs .cell svg { width: 15px; }
+.guide .figs .or { color: var(--muted); font-size: 13px; }
+.guide .abc { color: var(--ink); max-width: 420px; margin: 4px 0 12px; background: var(--paper); border-radius: 8px; padding: 4px 6px; }
+.guide .abc svg { display: block; }
+.guide .tunes { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 10px; }
+.guide .tunes .btn::before { content: "▶"; font-size: 10px; color: var(--green); }
+@media (max-width: 820px) {
+  .guide { grid-template-columns: minmax(0, 1fr); }
+  .guide nav { position: static; flex-direction: row; flex-wrap: wrap; gap: 4px; }
+  .guide nav a { border: 1px solid var(--line); font-size: 13px; padding: 3px 9px; }
+}
 </style>
 </head>
 <body>
@@ -232,6 +263,7 @@ textarea { width: 100%; min-height: 170px; font-family: var(--font-mono); font-s
       <p data-i18n="tagline"></p>
     </div>
     <div class="top-side">
+      <a class="guide-link" href="#guidePanel" id="guideLink" data-i18n="guideLink"></a>
       <label class="langpick"><span class="label" data-i18n="language">Language</span><select id="lang"></select></label>
       <div class="legend" data-i18n-aria="legendAria">
         <span><i class="c"></i><span data-i18n="closed"></span></span>
@@ -348,6 +380,11 @@ textarea { width: 100%; min-height: 170px; font-family: var(--font-mono); font-s
     <div class="chart" id="chart"></div>
   </details>
 
+  <details class="panel" id="guidePanel">
+    <summary><span data-i18n="guideTitle"></span> <small data-i18n="guideSub"></small></summary>
+    <div class="guide" id="guide"></div>
+  </details>
+
   <details class="panel" id="customPanel">
     <summary><span data-i18n="custom"></span> <small data-i18n="customSub"></small></summary>
     <div class="custom">
@@ -390,6 +427,7 @@ textarea { width: 100%; min-height: 170px; font-family: var(--font-mono); font-s
 <script src="i18n.js"></script>
 <script src="difficulty.js"></script>
 <script src="tunes.js"></script>
+<script src="guide.js"></script>
 <script src="tunes-oneill.js"></script>
 <script src="app.js"></script>
 </body>
