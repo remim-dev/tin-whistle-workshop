@@ -235,11 +235,11 @@
     return { pc, off, f, octave: off >= 12 ? 2 : 1, folded, sounding: k.base + off + 12, half: f.indexOf("H") >= 0 };
   }
 
-  const isNarrow = window.matchMedia("(max-width: 820px)");
+  const isNarrow = window.matchMedia("(max-width: 820px), (max-height: 500px)");
   let shown = null;
   function showNote(info) {
     shown = info;
-    $("whistle").innerHTML = whistleSVG(info ? info.f : "XXXXXX", { labels: true, horizontal: isNarrow.matches, octave2: info && info.octave === 2, aria: info ? tr("fingeringOf", noteName(info.pc)) : tr("whistleAria") });
+    $("whistle").innerHTML = whistleSVG(info ? info.f : "XXXXXX", { labels: !window.matchMedia("(max-height: 500px)").matches, horizontal: isNarrow.matches, octave2: info && info.octave === 2, aria: info ? tr("fingeringOf", noteName(info.pc)) : tr("whistleAria") });
     if (!info) { $("noteName").textContent = ""; $("noteEn").textContent = ""; $("badges").innerHTML = ""; return; }
     $("noteName").textContent = noteName(info.pc);
     $("noteEn").textContent = (altName(info.pc) ? altName(info.pc) + " · " : "") + tr("octave", info.octave);
@@ -342,6 +342,14 @@
   function qpm() { return Math.max(20, Math.round(visualObj.getBpm() * state.speed)); }
   function beatsPerMeasure() { try { return visualObj.getBeatsPerMeasure() || 4; } catch (e) { return 4; } }
 
+  // abcjs scales the score to fit its box: on a narrow screen, lay it out narrower with
+  // fewer bars per line instead of shrinking a wide layout until the staff is unreadable
+  function scoreLayout() {
+    const w = $("score").clientWidth || 760;
+    if (w >= 700) return { width: 760, bars: 4 };
+    return { width: Math.round(w / 0.85), bars: w < 480 ? 2 : 3 };
+  }
+  let layoutWidth = 0;
   function renderTune() {
     hardStop();
     const t = currentTune();
@@ -349,6 +357,8 @@
     renderedId = t.id;
     // In tab mode, systems are spread apart to fit a mini whistle under every note
     const abc = state.tab ? t.abc.replace(/^(X:.*)$/m, "$1\n%%staffsep 125") : t.abc;
+    const layout = scoreLayout();
+    layoutWidth = layout.width;
     const res = ABCJS.renderAbc("score", abc, {
       add_classes: true,
       responsive: "resize",
@@ -356,8 +366,8 @@
       clickListener: onNoteClick,
       selectionColor: accentColor(),
       paddingtop: 6, paddingbottom: state.tab ? 80 : 6, paddingleft: 4, paddingright: 4,
-      staffwidth: 760,
-      wrap: { minSpacing: 1.8, maxSpacing: 2.7, preferredMeasuresPerLine: 4 }
+      staffwidth: layout.width,
+      wrap: { minSpacing: 1.8, maxSpacing: 2.7, preferredMeasuresPerLine: layout.bars }
     });
     visualObj = res[0];
     try { visualObj.setUpAudio({}); } catch (e) { /* pitches stay available through the timings */ }
@@ -565,7 +575,7 @@
     const el = lit[0];
     if (el && state.playing) {
       const r = el.getBoundingClientRect();
-      const top = isNarrow.matches ? document.querySelector(".whistle-panel").getBoundingClientRect().bottom + 10 : 10;
+      const top = isNarrow.matches ? document.querySelector(".side").getBoundingClientRect().bottom + 10 : 10;
       if (r.top < top || r.bottom > window.innerHeight - 30) {
         window.scrollBy({ top: r.top - (top + window.innerHeight) / 2 + 40, behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
       }
@@ -1271,6 +1281,14 @@
     if (["textarea", "input", "select", "button", "summary"].includes(tag)) return;
     e.preventDefault();
     togglePlay();
+  });
+  // Lay the score out again when the screen is rotated, unless a tune is being played
+  let resizeTimer = 0;
+  window.addEventListener("resize", () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+      if (window.ABCJS && !state.playing && !state.paused && scoreLayout().width !== layoutWidth) renderTune();
+    }, 200);
   });
   const themeObs = new MutationObserver(() => { if (!state.playing) renderTune(); });
   themeObs.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
